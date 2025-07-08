@@ -1,0 +1,55 @@
+# random Forest 
+#random forest on DOS dataset
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Encode 'Transport Layer'
+le = LabelEncoder()
+df['Transport Layer'] = le.fit_transform(df['Transport Layer'])
+
+# Features and target
+features = ['Transport Layer', 'Dest Port', 'Packet Length', 'Packets/Time']
+X = df[features]
+y = df['target']
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Train Random Forest
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Predict
+y_pred = model.predict(X_test)
+
+# Evaluation
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("\nClassification Report:\n", report)
+print("\nConfusion Matrix:\n", conf_matrix)
+
+# --- Plot Feature Importances ---
+importances = model.feature_importances_
+plt.figure(figsize=(8, 5))
+sns.barplot(x=importances, y=features, palette="viridis")
+plt.title('Feature Importances in Random Forest')
+plt.xlabel('Importance Score')
+plt.ylabel('Features')
+plt.tight_layout()
+plt.show()
+
+# --- Plot Confusion Matrix ---
+plt.figure(figsize=(6, 5))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=[0, 1], yticklabels=[0, 1])
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.tight_layout()
+plt.show()
